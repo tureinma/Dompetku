@@ -93,11 +93,13 @@
 <div class="container">
     <h2>💰 Dompetku</h2>
     
+    <!-- Ringkasan Saldo -->
     <div class="balance-box">
         <small>Sisa Saldo Anda</small>
         <h1 id="total-balance">Rp 0</h1>
     </div>
 
+    <!-- Statistik -->
     <div class="stats">
         <div class="stat-box income">
             <small>Pemasukan</small>
@@ -109,6 +111,7 @@
         </div>
     </div>
 
+    <!-- Form Input -->
     <form id="finance-form">
         <input type="text" id="text-input" placeholder="Nama transaksi (ex: Beli Kopi)" required>
         <input type="number" id="amount-input" placeholder="Nominal (Rp)" required>
@@ -119,13 +122,14 @@
         <button type="submit">Tambah Transaksi</button>
     </form>
 
+    <!-- Riwayat Transaksi -->
     <h3>Riwayat Transaksi</h3>
     <ul id="history-list" class="history-list">
-        </ul>
+        <!-- Data akan muncul di sini via JavaScript -->
+    </ul>
 </div>
 
 <script>
-    // 1. Ambil semua elemen HTML yang kita butuhkan
     const financeForm = document.getElementById('finance-form');
     const textInput = document.getElementById('text-input');
     const amountInput = document.getElementById('amount-input');
@@ -135,10 +139,16 @@
     const totalIncome = document.getElementById('total-income');
     const totalExpense = document.getElementById('total-expense');
 
-    // 2. Wadah tempat menyimpan semua data transaksi (berupa Array)
-    let transactions = [];
+    // [BARU] Mengambil data lama dari LocalStorage saat aplikasi pertama kali dibuka.
+    // Jika memorinya kosong, maka kita buat array kosong []
+    const localData = localStorage.getItem('my_transactions');
+    let transactions = localData !== null ? JSON.parse(localData) : [];
 
-    // 3. Fungsi untuk menghitung saldo, pemasukan, dan pengeluaran
+    // [BARU] Fungsi khusus untuk menyimpan data ke memori browser
+    function saveToLocalStorage() {
+        localStorage.setItem('my_transactions', JSON.stringify(transactions));
+    }
+
     function updateValues() {
         let income = 0;
         let expense = 0;
@@ -153,21 +163,17 @@
 
         const balance = income - expense;
 
-        // Tampilkan angka hasil hitungan ke layar HTML
         totalBalance.innerText = 'Rp ' + balance.toLocaleString('id-ID');
         totalIncome.innerText = 'Rp ' + income.toLocaleString('id-ID');
         totalExpense.innerText = 'Rp ' + expense.toLocaleString('id-ID');
     }
 
-    // 4. Fungsi untuk menampilkan daftar riwayat di layar
     function renderList() {
-        // Kosongkan list lama agar tidak menumpuk saat di-update
         historyList.innerHTML = '';
 
         transactions.forEach(function(trx, index) {
             const li = document.createElement('li');
             
-            // Beri warna background berbeda berdasarkan jenis transaksi
             li.classList.add('history-item');
             if (trx.type === 'income') {
                 li.classList.add('item-income');
@@ -175,10 +181,8 @@
                 li.classList.add('item-expense');
             }
 
-            // Atur tanda + atau -
             let sign = trx.type === 'income' ? '+' : '-';
 
-            // Isi dari baris riwayat
             li.innerHTML = '<span>' + trx.text + '</span>' +
                            '<span>' + sign + ' Rp ' + trx.amount.toLocaleString('id-ID') + ' ' +
                            '<button class="delete-btn" onclick="deleteTransaction(' + index + ')">❌</button></span>';
@@ -187,38 +191,40 @@
         });
     }
 
-    // 5. Fungsi untuk menambah transaksi baru saat tombol diklik
     financeForm.addEventListener('submit', function(event) {
-        event.preventDefault(); // Mencegah halaman reload otomatis
+        event.preventDefault();
 
-        // Buat objek data transaksi baru
         const newTransaction = {
             text: textInput.value,
             amount: parseInt(amountInput.value),
             type: typeInput.value
         };
 
-        // Masukkan ke dalam wadah array
         transactions.push(newTransaction);
 
-        // Perbarui tampilan layar
+        // [BARU] Simpan setiap kali ada data masuk
+        saveToLocalStorage();
+
         updateValues();
         renderList();
 
-        // Kosongkan kembali form input
         textInput.value = '';
         amountInput.value = '';
     });
 
-    // 6. Fungsi untuk menghapus transaksi
     function deleteTransaction(index) {
-        // Hapus data berdasarkan urutan (index) nya
         transactions.splice(index, 1);
         
-        // Perbarui ulang tampilan layar
+        // [BARU] Simpan perubahan setelah data dihapus
+        saveToLocalStorage();
+
         updateValues();
         renderList();
     }
+
+    // [BARU] Jalankan fungsi ini di awal agar data yang tersimpan langsung muncul saat halaman dibuka
+    updateValues();
+    renderList();
 </script>
 
 </body>
