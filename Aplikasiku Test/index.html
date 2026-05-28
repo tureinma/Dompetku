@@ -3,157 +3,401 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dompetku - Catatan Keuangan</title>
+    <title>Dompetku v2 - Tampilan Modern</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f4f6f9;
+        /* --- RESET & BASIC STYLE --- */
+        * {
             margin: 0;
-            padding: 20px;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif; /* Menggunakan font Poppins */
+        }
+
+        body {
+            background-color: #F7F9FC; /* Abu-abu sangat muda */
             display: flex;
             justify-content: center;
+            padding: 0; /* Menghapus padding body agar header full */
         }
+
         .container {
             width: 100%;
-            max-width: 500px;
+            max-width: 480px; /* Lebar HP */
+            min-height: 100vh;
             background: white;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            overflow-x: hidden;
         }
-        h2 { text-align: center; color: #333; }
-        .balance-box {
-            background: #eef2f7;
-            padding: 15px;
-            border-radius: 8px;
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        .stats {
+
+        /* --- 1. HEADER & NAVIGATION --- */
+        header {
+            background-color: #2D67F6; /* Biru seperti di gambar */
+            color: white;
+            padding: 20px 25px 90px 25px; /* Padding bawah lebih besar untuk kartu saldo */
             display: flex;
             justify-content: space-between;
+            align-items: center;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 20px;
+        }
+
+        .welcome-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .welcome-text small {
+            font-size: 11px;
+            opacity: 0.8;
+            margin-bottom: 2px;
+        }
+
+        .welcome-text strong {
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        .notification-btn {
+            font-size: 20px;
+            cursor: pointer;
+            opacity: 0.9;
+        }
+
+        /* --- 2. FLOATING BALANCE CARD --- */
+        .balance-card {
+            background: white;
+            width: 90%;
+            padding: 20px;
+            border-radius: 16px;
+            position: absolute;
+            top: 75px; /* Melayang di atas header */
+            left: 5%;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+            z-index: 10;
+        }
+
+        .balance-label {
+            font-size: 12px;
+            color: #7f8c8d;
+            margin-bottom: 5px;
+        }
+
+        .balance-amount {
+            font-size: 26px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .stats-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            border-top: 1px solid #eee;
+            padding-top: 15px;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex: 1;
+        }
+
+        .stat-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 16px;
+        }
+
+        .income-icon { background-color: rgba(46, 204, 113, 0.1); color: #2ecc71; }
+        .expense-icon { background-color: rgba(231, 76, 60, 0.1); color: #e74c3c; }
+
+        .stat-texts {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-texts small {
+            font-size: 10px;
+            color: #7f8c8d;
+            margin-bottom: 1px;
+        }
+
+        .stat-texts strong {
+            font-size: 13px;
+            color: #333;
+        }
+
+        /* --- 3. FILTER & ADD TRANSACTION SECTION --- */
+        .main-content {
+            padding: 100px 25px 25px 25px; /* Top padding untuk memberi ruang kartu saldo */
+        }
+
+        .filter-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 20px;
         }
-        .stat-box {
-            flex: 1;
-            padding: 10px;
-            text-align: center;
+
+        .filter-section select {
+            padding: 8px 15px;
             border-radius: 8px;
-            margin: 0 5px;
-            color: white;
+            border: 1px solid #ddd;
+            font-size: 13px;
+            font-weight: 500;
+            color: #333;
+            background: white;
         }
-        .income { background-color: #2ecc71; }
-        .expense { background-color: #e74c3c; }
+
+        /* Tampilan Form Baru agar tidak terlalu besar */
         form {
             display: flex;
             flex-direction: column;
-            gap: 10px;
-            margin-bottom: 20px;
+            gap: 8px;
+            margin-bottom: 25px;
+            background: #fff;
+            padding: 15px;
+            border: 1px solid #eee;
+            border-radius: 12px;
         }
+
+        form label { font-size: 11px; font-weight: 600; color: #555; margin-bottom: -4px; }
         input, select, button {
-            padding: 10px;
+            padding: 8px;
             border: 1px solid #ddd;
             border-radius: 6px;
-            font-size: 16px;
+            font-size: 14px;
         }
         button {
-            background-color: #3498db;
+            background-color: #2D67F6;
             color: white;
             border: none;
             cursor: pointer;
-            font-weight: bold;
+            font-weight: 600;
+            margin-top: 5px;
         }
-        button:hover { background-color: #2980b9; }
-        .history-list {
-            list-style: none;
-            padding: 0;
+        button:hover { background-color: #1a51dd; }
+
+        /* --- 4. HISTORY LIST (MODERN STYLE) --- */
+        .history-header {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
         }
+
+        .history-list { list-style: none; }
+
         .history-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px;
+            padding: 15px 0;
             border-bottom: 1px solid #eee;
-            margin-bottom: 5px;
-            border-radius: 4px;
         }
-        .item-income { border-left: 5px solid #2ecc71; background: #f0fbf5; }
-        .item-expense { border-left: 5px solid #e74c3c; background: #fdf2f1; }
+
+        .history-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        /* BARU: Ikon Kategori Bulat */
+        .category-icon-box {
+            width: 45px;
+            height: 45px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 20px;
+        }
+
+        .item-info-texts { display: flex; flex-direction: column; }
+        .item-category-name { font-size: 14px; font-weight: 500; color: #333; }
+        .item-date-name { font-size: 11px; color: #7f8c8d; margin-top: 1px; }
+
+        .history-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .item-amount { font-size: 15px; font-weight: 600; }
+        .amount-plus { color: #2ecc71; }
+        .amount-minus { color: #e74c3c; }
+
         .delete-btn {
             background: none;
             border: none;
             color: #e74c3c;
             cursor: pointer;
-            font-weight: bold;
+            font-size: 16px;
+            opacity: 0.6;
         }
+        .delete-btn:hover { opacity: 1; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>💰 Dompetku</h2>
-    
-    <!-- Ringkasan Saldo -->
-    <div class="balance-box">
-        <small>Sisa Saldo Anda</small>
-        <h1 id="total-balance">Rp 0</h1>
+    <header>
+    <div class="user-info">
+    <div class="avatar">👤</div>
+    <div class="welcome-text">
+        <small>Selamat Datang</small>
+        <strong id="user-name">Tamu</strong>
+    </div>
+</div>
+        <div class="notification-btn">🔔</div>
+    </header>
+
+    <div class="balance-card">
+        <div class="balance-label">Sisa Saldo Bulan Ini</div>
+        <div id="total-balance" class="balance-amount">Rp 0</div>
+        
+        <div class="stats-row">
+            <div class="stat-item">
+                <div class="stat-icon income-icon">⬇️</div>
+                <div class="stat-texts">
+                    <small>Pemasukan</small>
+                    <strong id="total-income">Rp 0</strong>
+                </div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-icon expense-icon">⬆️</div>
+                <div class="stat-texts">
+                    <small>Pengeluaran</small>
+                    <strong id="total-expense">Rp 0</strong>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <!-- Statistik -->
-    <div class="stats">
-        <div class="stat-box income">
-            <small>Pemasukan</small>
-            <div id="total-income">Rp 0</div>
+    <main class="main-content">
+        <div class="filter-section">
+            <label>Laporan Bulanan</label>
+            <select id="month-filter" onchange="filterData()"></select>
         </div>
-        <div class="stat-box expense">
-            <small>Pengeluaran</small>
-            <div id="total-expense">Rp 0</div>
-        </div>
-    </div>
 
-    <!-- Form Input -->
-    <form id="finance-form">
-        <input type="text" id="text-input" placeholder="Nama transaksi (ex: Beli Kopi)" required>
-        <input type="number" id="amount-input" placeholder="Nominal (Rp)" required>
-        <select id="type-input">
-            <option value="income">Pemasukan</option>
-            <option value="expense">Pengeluaran</option>
-        </select>
-        <button type="submit">Tambah Transaksi</button>
-    </form>
+        <form id="finance-form">
+            <label>Pilih Kategori</label>
+            <select id="category-input" required>
+                <option value="Makanan">🍔 Makanan</option>
+                <option value="Transportasi">🚗 Transportasi</option>
+                <option value="Belanja">🛍️ Belanja</option>
+                <option value="Tagihan">🧾 Tagihan</option>
+                <option value="Gaji">💰 Gaji (Pemasukan)</option>
+                <option value="Lainnya">📦 Lainnya</option>
+            </select>
 
-    <!-- Riwayat Transaksi -->
-    <h3>Riwayat Transaksi</h3>
-    <ul id="history-list" class="history-list">
-        <!-- Data akan muncul di sini via JavaScript -->
-    </ul>
+            <label>Nominal (Rp)</label>
+            <input type="number" id="amount-input" placeholder="Nominal" required>
+            
+            <label>Tanggal Transaksi</label>
+            <input type="date" id="date-input" required>
+            
+            <label>Jenis</label>
+            <select id="type-input">
+                <option value="expense">Pengeluaran</option>
+                <option value="income">Pemasukan</option>
+            </select>
+            <button type="submit">Tambah Transaksi</button>
+        </form>
+
+        <h3 class="history-header">Riwayat Transaksi</h3>
+        <ul id="history-list" class="history-list">
+            </ul>
+    </main>
 </div>
 
 <script>
     const financeForm = document.getElementById('finance-form');
-    const textInput = document.getElementById('text-input');
+    const categoryInput = document.getElementById('category-input'); // BARU
     const amountInput = document.getElementById('amount-input');
+    const dateInput = document.getElementById('date-input');
     const typeInput = document.getElementById('type-input');
+    const monthFilter = document.getElementById('month-filter');
     const historyList = document.getElementById('history-list');
     const totalBalance = document.getElementById('total-balance');
     const totalIncome = document.getElementById('total-income');
     const totalExpense = document.getElementById('total-expense');
 
-    // [BARU] Mengambil data lama dari LocalStorage saat aplikasi pertama kali dibuka.
-    // Jika memorinya kosong, maka kita buat array kosong []
-    const localData = localStorage.getItem('my_transactions');
-    let transactions = localData !== null ? JSON.parse(localData) : [];
+    // Mengambil data menggunakan nama laci lama agar data pengguna aman
+const localData = localStorage.getItem('my_transactions_v2');
+let transactions = localData !== null ? JSON.parse(localData) : [];
 
-    // [BARU] Fungsi khusus untuk menyimpan data ke memori browser
-    function saveToLocalStorage() {
-        localStorage.setItem('my_transactions', JSON.stringify(transactions));
+    // Mengatur input tanggal default ke hari ini
+    const today = new Date().toISOString().split('T')[0];
+    dateInput.value = today;
+
+    // BARU: Peta Ikon & Warna untuk setiap kategori agar seperti gambar
+    const categoryMap = {
+        'Makanan': { icon: '🍔', color: '#FFF8ED' },
+        'Transportasi': { icon: '🚗', color: '#E8F6FD' },
+        'Belanja': { icon: '🛍️', color: '#FEE8F3' },
+        'Tagihan': { icon: '🧾', color: '#F0EFFD' },
+        'Gaji': { icon: '💰', color: '#EAFDF1' },
+        'Lainnya': { icon: '📦', color: '#F0F3F7' }
+    };
+
+    function setupMonthFilter() {
+        const months = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+        const current = new Date();
+        
+        monthFilter.innerHTML = '';
+        
+        const currentYear = current.getFullYear();
+        months.forEach((monthName, index) => {
+            const option = document.createElement('option');
+            const monthValue = currentYear + '-' + String(index + 1).padStart(2, '0');
+            option.value = monthValue;
+            option.innerText = monthName + ' ' + currentYear;
+            monthFilter.appendChild(option);
+        });
+
+        const currentMonthValue = currentYear + '-' + String(current.getMonth() + 1).padStart(2, '0');
+        monthFilter.value = currentMonthValue;
     }
 
-    function updateValues() {
+    function saveToLocalStorage() {
+    localStorage.setItem('my_transactions_v2', JSON.stringify(transactions));
+}
+
+    function filterData() {
+        const selectedMonth = monthFilter.value;
+
+        const filteredTransactions = transactions.filter(function(trx) {
+            return trx.date.startsWith(selectedMonth);
+        });
+
         let income = 0;
         let expense = 0;
 
-        transactions.forEach(function(trx) {
+        filteredTransactions.forEach(function(trx) {
             if (trx.type === 'income') {
                 income += trx.amount;
             } else {
@@ -166,26 +410,47 @@
         totalBalance.innerText = 'Rp ' + balance.toLocaleString('id-ID');
         totalIncome.innerText = 'Rp ' + income.toLocaleString('id-ID');
         totalExpense.innerText = 'Rp ' + expense.toLocaleString('id-ID');
-    }
 
-    function renderList() {
+        // Tampilkan daftar riwayat dengan DESAIN BARU
         historyList.innerHTML = '';
+        
+        // Urutkan transaksi berdasarkan tanggal (paling baru di atas)
+        filteredTransactions.sort(function(a,b) {
+            return new Date(b.date) - new Date(a.date);
+        });
 
-        transactions.forEach(function(trx, index) {
-            const li = document.createElement('li');
+        filteredTransactions.forEach(function(trx) {
+            const originalIndex = transactions.indexOf(trx);
+
+            // Ambil info ikon dan warna kategori
+            const categoryInfo = categoryMap[trx.category] || categoryMap['Lainnya'];
             
-            li.classList.add('history-item');
-            if (trx.type === 'income') {
-                li.classList.add('item-income');
-            } else {
-                li.classList.add('item-expense');
-            }
+            // Format tampilan tanggal (DD/MM/YYYY)
+            const dateParts = trx.date.split('-');
+            const formattedDate = dateParts[2] + '/' + dateParts[1] + '/' + dateParts[0];
 
             let sign = trx.type === 'income' ? '+' : '-';
+            let amountClass = trx.type === 'income' ? 'amount-plus' : 'amount-minus';
 
-            li.innerHTML = '<span>' + trx.text + '</span>' +
-                           '<span>' + sign + ' Rp ' + trx.amount.toLocaleString('id-ID') + ' ' +
-                           '<button class="delete-btn" onclick="deleteTransaction(' + index + ')">❌</button></span>';
+            const li = document.createElement('li');
+            li.classList.add('history-item');
+
+            // --- HTML DESAIN BARU (SAMA SEPERTI GAMBAR) ---
+            li.innerHTML = `
+                <div class="history-left">
+                    <div class="category-icon-box" style="background-color: ${categoryInfo.color};">
+                        ${categoryInfo.icon}
+                    </div>
+                    <div class="item-info-texts">
+                        <span class="item-category-name">${trx.category}</span>
+                        <span class="item-date-name">${formattedDate}</span>
+                    </div>
+                </div>
+                <div class="history-right">
+                    <span class="item-amount ${amountClass}">${sign}Rp ${trx.amount.toLocaleString('id-ID')}</span>
+                    <button class="delete-btn" onclick="deleteTransaction(${originalIndex})">❌</button>
+                </div>
+            `;
 
             historyList.appendChild(li);
         });
@@ -195,36 +460,62 @@
         event.preventDefault();
 
         const newTransaction = {
-            text: textInput.value,
+            category: categoryInput.value, // BARU
             amount: parseInt(amountInput.value),
+            date: dateInput.value,
             type: typeInput.value
         };
 
         transactions.push(newTransaction);
-
-        // [BARU] Simpan setiap kali ada data masuk
         saveToLocalStorage();
+        
+        const trxMonth = newTransaction.date.substring(0, 7);
+        monthFilter.value = trxMonth;
 
-        updateValues();
-        renderList();
+        filterData();
 
-        textInput.value = '';
+        categoryInput.value = 'Makanan';
         amountInput.value = '';
+        dateInput.value = today;
+        typeInput.value = 'expense';
     });
 
-    function deleteTransaction(index) {
-        transactions.splice(index, 1);
-        
-        // [BARU] Simpan perubahan setelah data dihapus
+    function deleteTransaction(originalIndex) {
+        transactions.splice(originalIndex, 1);
         saveToLocalStorage();
-
-        updateValues();
-        renderList();
+        filterData();
     }
 
-    // [BARU] Jalankan fungsi ini di awal agar data yang tersimpan langsung muncul saat halaman dibuka
-    updateValues();
-    renderList();
+    // [BARU] Fungsi untuk mengatur nama pengguna
+function setupUserName() {
+    // Ambil elemen HTML yang menampilkan nama
+    const userNameElement = document.getElementById('user-name');
+
+    // Cek apakah sudah ada nama yang disimpan di memori browser
+    let savedName = localStorage.getItem('my_username');
+
+    // Jika belum ada nama yang disimpan
+    if (!savedName) {
+        // Tampilkan pop-up untuk meminta pengguna memasukkan nama
+        savedName = prompt('Halo! Siapa namamu?', 'Tamu');
+
+        // Jika pengguna menekan cancel atau mengosongkan nama
+        if (!savedName) {
+            savedName = 'Tamu';
+        }
+
+        // Simpan nama yang dimasukkan ke memori browser
+        localStorage.setItem('my_username', savedName);
+    }
+
+    // Tampilkan nama di layar aplikasi
+    userNameElement.innerText = savedName;
+}
+
+// Alur jalannya aplikasi pertama kali
+setupUserName(); // [BARU] Menjalankan fungsi nama pengguna terlebih dahulu
+setupMonthFilter();
+filterData();
 </script>
 
 </body>
